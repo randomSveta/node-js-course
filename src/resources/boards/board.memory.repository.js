@@ -1,13 +1,5 @@
-const BOARDS = [
-  { id: 1, title: 'Amy', columns: [{ title: 'A', order: 0 }] },
-  { id: 2, title: 'Jess', columns: [{ title: 'A', order: 0 }] },
-  { id: 3, title: 'Daria', columns: [{ title: 'A', order: 0 }] },
-  {
-    id: '29c08d12-d485-4b40-a304-7f4945e1b378',
-    title: 'string',
-    columns: [{ title: 'string', order: 0 }]
-  }
-];
+const boardsDB = require('./boardsDB');
+const BOARDS = boardsDB.addBoardsToDB();
 const Board = require('./board.model');
 // const Column = require('./column.model');
 
@@ -22,7 +14,7 @@ const createBoard = async board => {
 };
 
 const getBoard = async id => {
-  return BOARDS.filter(board => board.id.toString() === id)[0];
+  return BOARDS.filter(board => board.id === id)[0];
 };
 
 const updateBoard = async (id, updatedBoard) => {
@@ -47,4 +39,11 @@ const deleteBoard = async id => {
   return 'The board has been deleted';
 };
 
-module.exports = { getAll, getBoard, createBoard, updateBoard, deleteBoard };
+module.exports = {
+  getAll,
+  getBoard,
+  createBoard,
+  updateBoard,
+  deleteBoard,
+  BOARDS
+};

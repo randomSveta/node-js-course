@@ -1,8 +1,5 @@
-const USERS = [
-  { id: 1, name: 'Amy' },
-  { id: 2, name: 'Jess' },
-  { id: 3, name: 'Daria' }
-];
+const usersDB = require('./usersDB');
+const USERS = usersDB.addUsersToDB();
 const User = require('./user.model');
 
 const getAll = async () => {
@@ -40,4 +37,4 @@ const deleteUser = async id => {
   return 'The user has been deleted';
 };
 
-module.exports = { getAll, getUser, createUser, updateUser, deleteUser };
+module.exports = { getAll, getUser, createUser, updateUser, deleteUser, USERS };

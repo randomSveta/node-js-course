@@ -23,7 +23,7 @@ router.route('/:id').put(async (req, res) => {
 });
 
 router.route('/:id').delete(async (req, res) => {
-  const message = await usersService.getUser(req.params.id);
+  const message = await usersService.deleteUser(req.params.id);
   res.status(204).send(message);
 });
 
