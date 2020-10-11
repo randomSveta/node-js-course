@@ -1,12 +1,5 @@
-const DB_FROM_USER = require('../users/user.memory.repository');
-const DB = require('../db');
-const DB_DATA =
-  DB_FROM_USER.USERS.length > 0 ? DB_FROM_USER : DB.addDataToDB(3);
-const USERS = DB_DATA.USERS;
-const BOARDS = DB_DATA.BOARDS;
-const TASKS = DB_DATA.TASKS;
+const { BOARDS } = require('./boardsDB');
 const Board = require('./board.model');
-// const Column = require('./column.model');
 
 const getAll = async () => {
   return BOARDS;
@@ -19,7 +12,8 @@ const createBoard = async board => {
 };
 
 const getBoard = async id => {
-  return BOARDS.filter(board => board.id === id)[0];
+  const index = BOARDS.findIndex(board => board.id === id);
+  if (index + 1) return BOARDS[index];
 };
 
 const updateBoard = async (id, updatedBoard) => {
@@ -38,10 +32,11 @@ const updateBoard = async (id, updatedBoard) => {
 };
 
 const deleteBoard = async id => {
-  BOARDS.forEach((board, index, array) => {
-    if (board.id === id) array.splice(index, 1);
-  });
-  return 'The board has been deleted';
+  const index = BOARDS.findIndex(board => board.id === id);
+  if (index + 1) {
+    BOARDS.splice(index, 1);
+    return "Board and it's tasks have been deleted";
+  }
 };
 
 module.exports = {
@@ -49,8 +44,5 @@ module.exports = {
   getBoard,
   createBoard,
   updateBoard,
-  deleteBoard,
-  USERS,
-  BOARDS,
-  TASKS
+  deleteBoard
 };

@@ -1,19 +1,24 @@
-const DB = require('../boards/board.memory.repository');
-const TASKS = DB.TASKS;
+const { TASKS } = require('./tasksDB');
 const Task = require('./task.model');
 
-const getAll = async boardId => TASKS.filter(task => task.boardId === boardId);
+const getAll = async boardId => {
+  return TASKS.filter(task => task.boardId === boardId);
+};
 
-const createTask = async task => {
+const createTask = async (boardId, task) => {
+  task.boardId = boardId;
+
   const createdTask = new Task(task);
   TASKS.push(createdTask);
+
   return createdTask;
 };
 
 const getTask = async (boardId, taskId) => {
-  return TASKS.filter(
+  const index = TASKS.findIndex(
     task => task.boardId === boardId && task.id === taskId
-  )[0];
+  );
+  if (index + 1) return TASKS[index];
 };
 
 const updateTask = async (boardId, taskId, updatedTask) => {
@@ -41,11 +46,10 @@ const deleteTask = async (boardId, taskId) => {
   const index = TASKS.findIndex(
     task => task.boardId === boardId && task.id === taskId
   );
-
-  if (index + 1) TASKS.splice(index, 1);
-  else return null;
-
-  return 'Task has been deleted';
+  if (index + 1) {
+    TASKS.splice(index, 1);
+    return 'Task has been deleted';
+  }
 };
 
 module.exports = { getAll, getTask, createTask, updateTask, deleteTask, TASKS };

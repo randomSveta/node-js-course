@@ -1,10 +1,6 @@
-const DB = require('../db');
-const DB_DATA = DB.addDataToDB(3);
-const USERS = DB_DATA.USERS;
+const { USERS } = require('./usersDB');
+const { TASKS } = require('../tasks/tasksDB');
 const User = require('./user.model');
-
-const BOARDS = DB_DATA.BOARDS;
-const TASKS = DB_DATA.TASKS;
 
 const getAll = async () => {
   return USERS;
@@ -17,7 +13,8 @@ const createUser = async user => {
 };
 
 const getUser = async id => {
-  return USERS.filter(user => user.id === id)[0];
+  const index = USERS.findIndex(user => user.id === id);
+  if (index + 1) return USERS[index];
 };
 
 const updateUser = async (id, updatedUser) => {
@@ -50,8 +47,5 @@ module.exports = {
   getUser,
   createUser,
   updateUser,
-  deleteUser,
-  USERS,
-  BOARDS,
-  TASKS
+  deleteUser
 };

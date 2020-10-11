@@ -1,6 +1,8 @@
 const router = require('express').Router();
-const User = require('./user.model');
 const usersService = require('./user.service');
+const tasksService = require('../tasks/task.service');
+const User = require('./user.model');
+const { TASKS } = require('../tasks/tasksDB');
 
 router.route('/').get(async (req, res) => {
   const users = await usersService.getAll();
@@ -9,7 +11,8 @@ router.route('/').get(async (req, res) => {
 
 router.route('/:id').get(async (req, res) => {
   const user = await usersService.getUser(req.params.id);
-  res.status(200).send(User.toResponse(user));
+  if (user) res.status(200).send(User.toResponse(user));
+  else res.status(404).end('Not found');
 });
 
 router.route('/').post(async (req, res) => {
@@ -23,11 +26,17 @@ router.route('/:id').put(async (req, res) => {
 });
 
 router.route('/:id').delete(async (req, res) => {
+  while (TASKS.findIndex(task => task.userId === req.params.id) + 1) {
+    const index = TASKS.findIndex(task => task.userId === req.params.id);
+    const newTask = Object.assign({}, TASKS[index]);
+    newTask.userId = null;
+    tasksService.updateTask(TASKS[index].boardId, TASKS[index].id, newTask);
+  }
+
   const message = await usersService.deleteUser(req.params.id);
 
-  if (message) return res.status(204);
-
-  return res.status(404);
+  if (message) res.status(204).send(message);
+  else res.status(404).end('Not found');
 });
 
 module.exports = router;
