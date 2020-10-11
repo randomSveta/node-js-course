@@ -1,5 +1,5 @@
-const tasksDB = require('./tasksDB');
-const TASKS = tasksDB.addTasksToDB();
+const DB = require('../boards/board.memory.repository');
+const TASKS = DB.TASKS;
 const Task = require('./task.model');
 
 const getAll = async boardId => TASKS.filter(task => task.boardId === boardId);
@@ -48,4 +48,4 @@ const deleteTask = async (boardId, taskId) => {
   return 'Task has been deleted';
 };
 
-module.exports = { getAll, getTask, createTask, updateTask, deleteTask };
+module.exports = { getAll, getTask, createTask, updateTask, deleteTask, TASKS };

@@ -1,6 +1,10 @@
-const usersDB = require('./usersDB');
-const USERS = usersDB.addUsersToDB();
+const DB = require('../db');
+const DB_DATA = DB.addDataToDB(3);
+const USERS = DB_DATA.USERS;
 const User = require('./user.model');
+
+const BOARDS = DB_DATA.BOARDS;
+const TASKS = DB_DATA.TASKS;
 
 const getAll = async () => {
   return USERS;
@@ -31,10 +35,23 @@ const updateUser = async (id, updatedUser) => {
 };
 
 const deleteUser = async id => {
-  USERS.forEach((user, index, array) => {
-    if (user.id === id) array.splice(index, 1);
-  });
-  return 'The user has been deleted';
+  const index = USERS.findIndex(user => user.id === id);
+
+  if (index + 1) {
+    TASKS.forEach(task => {
+      if (task.userId === id) task.userId = null;
+    });
+    return 'User and user tasks have been deleted';
+  }
 };
 
-module.exports = { getAll, getUser, createUser, updateUser, deleteUser, USERS };
+module.exports = {
+  getAll,
+  getUser,
+  createUser,
+  updateUser,
+  deleteUser,
+  USERS,
+  BOARDS,
+  TASKS
+};

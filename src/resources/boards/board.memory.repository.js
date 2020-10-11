@@ -1,5 +1,10 @@
-const boardsDB = require('./boardsDB');
-const BOARDS = boardsDB.addBoardsToDB();
+const DB_FROM_USER = require('../users/user.memory.repository');
+const DB = require('../db');
+const DB_DATA =
+  DB_FROM_USER.USERS.length > 0 ? DB_FROM_USER : DB.addDataToDB(3);
+const USERS = DB_DATA.USERS;
+const BOARDS = DB_DATA.BOARDS;
+const TASKS = DB_DATA.TASKS;
 const Board = require('./board.model');
 // const Column = require('./column.model');
 
@@ -45,5 +50,7 @@ module.exports = {
   createBoard,
   updateBoard,
   deleteBoard,
-  BOARDS
+  USERS,
+  BOARDS,
+  TASKS
 };
