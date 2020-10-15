@@ -3,6 +3,7 @@ const { TASKS } = require('../tasks/tasksDB');
 const User = require('./user.model');
 
 const getAll = async () => {
+  // throw new Error(); //error 500
   return USERS;
 };
 

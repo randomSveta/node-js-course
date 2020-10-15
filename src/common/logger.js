@@ -1,18 +1,45 @@
-module.exports = function logger(req, res, next) {
+function logRequest(req, res, next) {
   const date = new Date();
-  console.log('----- LOGGER -----');
-  console.log('time: ', date.toTimeString());
-  console.log('request type: ', req.method);
-  console.log('request url: ', req.originalUrl);
-  if (req.method === 'POST' || req.method === 'PUT') {
-    console.log('request body: ', req.body);
-  }
 
+  // overwrite "id: undefined" for GET, POST params
   const parameters = {};
   for (const param in req.params) {
     if (req.params[param]) parameters[param] = req.params[param];
   }
-  console.log('parameters: ', parameters);
+
+  delete req.body.password; // remove sensitive data
+
+  console.log(`
+  ----- LOG -----
+  TIME: ${date.toString()}
+  TYPE: ${req.method}
+  URL: ${req.originalUrl}
+  PARAMS: ${JSON.stringify(parameters)}
+  BODY: ${
+    req.method === 'POST' || req.method === 'PUT'
+      ? JSON.stringify(req.body)
+      : `no body for ${req.method}`
+  }
+  CODE: ${res.statusCode}`);
 
   next();
+}
+
+function logError(error, req, res, next) {
+  console.log(`
+  ----- ERROR START-----`);
+  logRequest(req, res, next);
+  console.log(`  ERROR STATUS: ${error.status}
+  ERROR MESSAGE: ${error.message}
+  ERROR DETAILS:
+  ${error.stack}
+  ----- ERROR END-----
+  `);
+
+  next();
+}
+
+module.exports = {
+  logRequest,
+  logError
 };
