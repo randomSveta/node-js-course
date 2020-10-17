@@ -39,7 +39,29 @@ function logError(error, req, res, next) {
   next();
 }
 
+function logUnhandledRejection(err, promise) {
+  console.log(`
+  ----- ERROR START-----
+  ERROR: ${err}
+  `);
+  console.log('ERROR PROMISE REJECTION DETAILS:', promise);
+  console.log('----- ERROR END-----');
+}
+
+function logUncaughtException(err, origin) {
+  console.log(`
+  ----- ERROR START-----
+  ERROR: ${err}
+  ERROR TYPE: ${origin}
+  ERROR DETAILS:
+  ${err.stack}
+  ----- ERROR END-----
+  `);
+}
+
 module.exports = {
   logRequest,
-  logError
+  logError,
+  logUnhandledRejection,
+  logUncaughtException
 };
