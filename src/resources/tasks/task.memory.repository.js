@@ -22,7 +22,7 @@ const getTask = async (boardId, taskId) => {
 };
 
 const updateTask = async (boardId, taskId, updatedTask) => {
-  TASKS.map(task => {
+  TASKS.forEach(task => {
     if (task.boardId === boardId && task.id === taskId) {
       if (updatedTask.title !== task.title) task.title = updatedTask.title;
       if (updatedTask.order !== task.order) task.order = updatedTask.order;
@@ -37,7 +37,6 @@ const updateTask = async (boardId, taskId, updatedTask) => {
         task.columnId = updatedTask.columnId;
       }
     }
-    return task;
   });
   return TASKS.filter(task => task.id === taskId)[0];
 };
