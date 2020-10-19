@@ -17,7 +17,11 @@ router.route('/:id').get(async (req, res, next) => {
   try {
     const board = await boardService.getBoard(req.params.id);
     if (board) res.status(200).send(Board.toResponse(board));
-    else res.status(404).end('Not found');
+    else {
+      const err = new Error('Not Found');
+      err.status = 404;
+      return next(err);
+    }
   } catch (err) {
     return next(err);
   }
@@ -50,7 +54,11 @@ router.route('/:id').delete(async (req, res, next) => {
 
     const message = await boardService.deleteBoard(req.params.id);
     if (message) res.status(204).send(message);
-    else res.status(404).end('Not found');
+    else {
+      const err = new Error('Not Found');
+      err.status = 404;
+      return next(err);
+    }
   } catch (err) {
     return next(err);
   }

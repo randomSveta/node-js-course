@@ -1,3 +1,26 @@
+const winston = require('winston');
+
+const winstonLogger = winston.createLogger({
+  level: 'info',
+  format: winston.format.combine(winston.format.simple()),
+  defaultMeta: { service: 'user-service' },
+  transports: [
+    new winston.transports.File({
+      filename: './src/common/logs/error.log',
+      level: 'error'
+    }),
+    new winston.transports.File({ filename: './src/common/logs/combined.log' }),
+    new winston.transports.Console({
+      format: winston.format.combine(
+        // winston.format.timestamp(),
+        winston.format.colorize(),
+        winston.format.simple()
+      )
+    })
+  ],
+  exitOnError: false
+});
+
 function logRequest(req, res, next) {
   const date = new Date();
 
@@ -9,59 +32,77 @@ function logRequest(req, res, next) {
 
   delete req.body.password; // remove sensitive data
 
-  console.log(`
-  ----- LOG -----
-  TIME: ${date.toString()}
-  TYPE: ${req.method}
-  URL: ${req.originalUrl}
-  PARAMS: ${JSON.stringify(parameters)}
-  BODY: ${
-    req.method === 'POST' || req.method === 'PUT'
-      ? JSON.stringify(req.body)
-      : `no body for ${req.method}`
-  }
-  CODE: ${res.statusCode}`);
-
+  winstonLogger.log(
+    'info',
+    `
+    TIME: ${date.toString()}
+    TYPE: ${req.method}
+    URL: ${req.originalUrl}
+    PARAMS: ${JSON.stringify(parameters)}
+    BODY: ${
+      req.method === 'POST' || req.method === 'PUT'
+        ? JSON.stringify(req.body)
+        : `no body for ${req.method}`
+    }
+`
+  );
   next();
 }
 
 function logError(error, req, res, next) {
-  console.log(`
-  ----- ERROR START-----`);
-  logRequest(req, res, next);
-  console.log(`  ERROR STATUS: ${error.status}
-  ERROR MESSAGE: ${error.message}
-  ERROR DETAILS:
-  ${error.stack}
-  ----- ERROR END-----
-  `);
+  const date = new Date();
 
+  winstonLogger.log(
+    'error',
+    `
+    TIME: ${date.toString()}
+    TYPE: ${req.method}
+    URL: ${req.originalUrl}
+    BODY: ${
+      req.method === 'POST' || req.method === 'PUT'
+        ? JSON.stringify(req.body)
+        : `no body for ${req.method}`
+    }
+    ERROR STATUS: ${error.status}
+    ERROR MESSAGE: ${error.message}
+    ERROR DETAILS:
+    ${error.stack}
+    `
+  );
   next();
 }
 
-function logUnhandledRejection(err, promise) {
-  console.log(`
-  ----- ERROR START-----
+function logUnhandledRejection(err) {
+  const date = new Date();
+
+  winstonLogger.log(
+    'error',
+    `
+  TIME: ${date.toString()}
   ERROR: ${err}
-  `);
-  console.log('ERROR PROMISE REJECTION DETAILS:', promise);
-  console.log('----- ERROR END-----');
+  ERROR PROMISE REJECTION DETAILS: ${err.stack}`
+  );
 }
 
 function logUncaughtException(err, origin) {
-  console.log(`
-  ----- ERROR START-----
+  const date = new Date();
+
+  winstonLogger.log(
+    'error',
+    `
+  TIME: ${date.toString()}
   ERROR: ${err}
   ERROR TYPE: ${origin}
   ERROR DETAILS:
   ${err.stack}
-  ----- ERROR END-----
-  `);
+  `
+  );
 }
 
 module.exports = {
   logRequest,
   logError,
   logUnhandledRejection,
-  logUncaughtException
+  logUncaughtException,
+  winstonLogger
 };

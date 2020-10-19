@@ -7,7 +7,7 @@ const { TASKS } = require('../tasks/tasksDB');
 router.route('/').get(async (req, res, next) => {
   try {
     const users = await usersService.getAll();
-    res.json(users.map(User.toResponse));
+    res.status(200).json(users.map(User.toResponse));
   } catch (err) {
     return next(err);
   }
@@ -17,7 +17,11 @@ router.route('/:id').get(async (req, res, next) => {
   try {
     const user = await usersService.getUser(req.params.id);
     if (user) res.status(200).send(User.toResponse(user));
-    else res.status(404).end('Not found');
+    else {
+      const err = new Error('Not Found');
+      err.status = 404;
+      return next(err);
+    }
   } catch (err) {
     return next(err);
   }
@@ -36,7 +40,11 @@ router.route('/:id').put(async (req, res, next) => {
   try {
     const user = await usersService.updateUser(req.params.id, req.body);
     if (user) res.status(200).send(User.toResponse(user));
-    else res.status(404).end('Not found');
+    else {
+      const err = new Error('Not Found');
+      err.status = 404;
+      return next(err);
+    }
   } catch (err) {
     return next(err);
   }
@@ -54,7 +62,11 @@ router.route('/:id').delete(async (req, res, next) => {
     const message = await usersService.deleteUser(req.params.id);
 
     if (message) res.status(204).send(message);
-    else res.status(404).end('Not found');
+    else {
+      const err = new Error('Not Found');
+      err.status = 404;
+      return next(err);
+    }
   } catch (err) {
     return next(err);
   }

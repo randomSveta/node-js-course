@@ -9,7 +9,6 @@ function handleErrors(err, req, res, next) {
       message: err.message
     }
   });
-
   next(err);
 }
 
@@ -17,12 +16,12 @@ function handleUncaughtException(err, origin) {
   logUncaughtException(err, origin);
 }
 
-function handleUnhandledRejection(reason, promise) {
-  logUnhandledRejection(reason, promise);
+function handleUnhandledPromiseRejection(reason) {
+  logUnhandledRejection(reason);
 }
 
 module.exports = {
   handleErrors,
   handleUncaughtException,
-  handleUnhandledRejection
+  handleUnhandledPromiseRejection
 };

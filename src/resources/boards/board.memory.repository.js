@@ -1,4 +1,5 @@
 const { BOARDS } = require('./boardsDB');
+const { TASKS } = require('../tasks/tasksDB');
 const Board = require('./board.model');
 
 const getAll = async () => {
@@ -17,7 +18,7 @@ const getBoard = async id => {
 };
 
 const updateBoard = async (id, updatedBoard) => {
-  BOARDS.map(board => {
+  BOARDS.forEach(board => {
     if (board.id === id) {
       if (updatedBoard.title !== board.title) board.title = updatedBoard.title;
       if (
@@ -26,7 +27,6 @@ const updateBoard = async (id, updatedBoard) => {
         board.columns = [...updatedBoard.columns];
       }
     }
-    return board;
   });
   return BOARDS.filter(board => board.id === id)[0];
 };
@@ -34,6 +34,11 @@ const updateBoard = async (id, updatedBoard) => {
 const deleteBoard = async id => {
   const index = BOARDS.findIndex(board => board.id === id);
   if (index + 1) {
+    TASKS.forEach((task, i, arr) => {
+      if (task.boardId === id) {
+        arr.splice(i, 1);
+      }
+    });
     BOARDS.splice(index, 1);
     return "Board and it's tasks have been deleted";
   }

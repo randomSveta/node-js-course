@@ -2,6 +2,7 @@ const router = require('express').Router({ mergeParams: true });
 const tasksService = require('./task.service');
 const boardsService = require('../boards/board.service');
 const Task = require('./task.model');
+const boardService = require('../boards/board.service');
 
 router.route('/').get(async (req, res, next) => {
   try {
@@ -9,9 +10,12 @@ router.route('/').get(async (req, res, next) => {
 
     if (board) {
       const tasks = await tasksService.getAll(req.params.boardId);
-      if (tasks) res.json(tasks.map(Task.toResponse));
-      else res.status(404).end('Not found');
-    } else res.status(404).end('Not found');
+      res.json(tasks.map(Task.toResponse));
+    } else {
+      const err = new Error('Not Found');
+      err.status = 404;
+      return next(err);
+    }
   } catch (err) {
     return next(err);
   }
@@ -25,7 +29,11 @@ router.route('/:taskId').get(async (req, res, next) => {
     );
 
     if (task) res.status(200).send(Task.toResponse(task));
-    else res.status(404).end('Not found');
+    else {
+      const err = new Error('Not Found');
+      err.status = 404;
+      return next(err);
+    }
   } catch (err) {
     return next(err);
   }
@@ -34,7 +42,13 @@ router.route('/:taskId').get(async (req, res, next) => {
 router.route('/').post(async (req, res, next) => {
   try {
     const task = await tasksService.createTask(req.params.boardId, req.body);
-    res.status(200).send(Task.toResponse(task));
+    const board = await boardService.getBoard(req.params.boardId);
+    if (board) res.status(200).send(Task.toResponse(task));
+    else {
+      const err = new Error('Not Found');
+      err.status = 404;
+      return next(err);
+    }
   } catch (err) {
     return next(err);
   }
@@ -48,7 +62,11 @@ router.route('/:taskId').put(async (req, res, next) => {
       req.body
     );
     if (task) res.status(200).send(Task.toResponse(task));
-    else res.status(404).end('Not found');
+    else {
+      const err = new Error('Not Found');
+      err.status = 404;
+      return next(err);
+    }
   } catch (err) {
     return next(err);
   }
@@ -62,7 +80,11 @@ router.route('/:taskId').delete(async (req, res, next) => {
     );
 
     if (message) res.status(204).send(message);
-    else res.status(404).end('Not found');
+    else {
+      const err = new Error('Not Found');
+      err.status = 404;
+      return next(err);
+    }
   } catch (err) {
     return next(err);
   }

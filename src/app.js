@@ -9,7 +9,7 @@ const { logRequest, logError } = require('./common/logger');
 const {
   handleErrors,
   handleUncaughtException,
-  handleUnhandledRejection
+  handleUnhandledPromiseRejection
 } = require('./common/error-handler');
 
 const app = express();
@@ -27,7 +27,7 @@ app.use('/', (req, res, next) => {
   next();
 });
 
-// logger
+// request logger
 app.use(
   ['/users/:id?', '/boards/:boardId/tasks/:taskId?', '/boards/:id?'],
   logRequest
@@ -38,20 +38,14 @@ app.use('/boards', boardRouter);
 app.use('/boards/:boardId/tasks', taskRouter);
 
 // error logger and handler
-app.use(
-  ['/users/:id?', '/boards/:boardId/tasks/:taskId?', '/boards/:id?'],
-  handleErrors,
-  logError
-);
+app.use(handleErrors, logError);
 
 process
-  .on('unhandledRejection', (reason, promise) => {
-    handleUnhandledRejection(reason, promise);
-    // process.exit(1);
+  .on('unhandledRejection', reason => {
+    handleUnhandledPromiseRejection(reason);
   })
   .on('uncaughtException', (err, origin) => {
     handleUncaughtException(err, origin);
-    // process.exit(1);
   });
 
 // throw Error('Oops EXCEPTION!!!!!!!');
