@@ -28,10 +28,7 @@ app.use('/', (req, res, next) => {
 });
 
 // request logger
-app.use(
-  ['/users/:id?', '/boards/:boardId/tasks/:taskId?', '/boards/:id?'],
-  logRequest
-);
+app.use(logRequest);
 
 app.use('/users', userRouter);
 app.use('/boards', boardRouter);

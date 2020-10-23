@@ -1,0 +1,28 @@
+info: 
+    TIME: Fri Oct 23 2020 23:05:46 GMT+0100 (British Summer Time)
+    TYPE: GET
+    URL: /favicon.ico
+    PARAMS: [object Object]
+    BODY: no body for GET
+
+info: 
+    TIME: Fri Oct 23 2020 23:05:51 GMT+0100 (British Summer Time)
+    TYPE: GET
+    URL: /users
+    PARAMS: [object Object]
+    BODY: no body for GET
+
+info: 
+    TIME: Fri Oct 23 2020 23:07:02 GMT+0100 (British Summer Time)
+    TYPE: GET
+    URL: /users?name=sveta
+    PARAMS: [object Object]
+    BODY: no body for GET
+
+info: 
+    TIME: Fri Oct 23 2020 23:07:47 GMT+0100 (British Summer Time)
+    TYPE: GET
+    URL: /users?name=sveta
+    QUERY PARAMS: {"name":"sveta"}
+    BODY: no body for GET
+
