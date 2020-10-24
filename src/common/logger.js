@@ -23,7 +23,7 @@ const winstonLogger = winston.createLogger({
 
 function logRequest(req, res, next) {
   const date = new Date();
-  delete req.body.password; // remove sensitive data
+  // delete req.body.password; // remove sensitive data
 
   winstonLogger.log(
     'info',
