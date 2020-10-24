@@ -26,16 +26,29 @@ const taskSchema = new Schema(
     boardId: {
       type: String,
       unique: false,
-      required: true
+      required: false
     },
     columnId: {
       type: String,
       unique: false,
-      required: true
+      required: false
     }
   },
   { versionKey: false }
 );
+
+taskSchema.statics.toResponse = task => {
+  const { _id, title, order, description, userId, boardId, columnId } = task;
+  return {
+    id: _id,
+    title,
+    order,
+    description,
+    userId,
+    boardId,
+    columnId
+  };
+};
 
 const Task = mongoose.model('Task', taskSchema);
 

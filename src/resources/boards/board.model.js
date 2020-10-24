@@ -1,7 +1,13 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
+
 const columnSchema = new Schema(
   {
+    id: {
+      type: String,
+      unique: true,
+      require: false
+    },
     title: {
       type: String,
       unique: false,
@@ -13,7 +19,7 @@ const columnSchema = new Schema(
       required: false
     }
   },
-  { versionKey: false }
+  { versionKey: false, _id: false }
 );
 
 const boardSchema = new Schema(
@@ -27,6 +33,10 @@ const boardSchema = new Schema(
   },
   { versionKey: false }
 );
+boardSchema.statics.toResponse = board => {
+  const { _id, title, columns } = board;
+  return { id: _id, title, columns };
+};
 
 const Board = mongoose.model('Board', boardSchema);
 

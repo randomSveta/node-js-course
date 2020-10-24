@@ -23,7 +23,14 @@ const winstonLogger = winston.createLogger({
 
 function logRequest(req, res, next) {
   const date = new Date();
-  // delete req.body.password; // remove sensitive data
+
+  if (req.body.password) {
+    // hide sensitive data
+    Object.defineProperty(req.body, 'password', {
+      enumerable: false,
+      value: req.body.password
+    });
+  }
 
   winstonLogger.log(
     'info',
@@ -39,6 +46,14 @@ function logRequest(req, res, next) {
     }
 `
   );
+
+  if (req.body.password) {
+    Object.defineProperty(req.body, 'password', {
+      enumerable: true,
+      value: req.body.password
+    });
+  }
+
   next();
 }
 

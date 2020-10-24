@@ -1,5 +1,6 @@
 const { Task } = require('../tasks/task.model');
 const { Board } = require('./board.model');
+const uuid = require('uuid');
 
 const getAll = async () => {
   const boards = await Board.find({});
@@ -8,6 +9,7 @@ const getAll = async () => {
 };
 
 const createBoard = async board => {
+  board.columns.forEach(column => (column.id = uuid()));
   const createdBoard = await new Board(board);
   await createdBoard.save();
 
