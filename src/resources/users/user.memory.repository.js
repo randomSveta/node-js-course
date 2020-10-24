@@ -1,3 +1,4 @@
+const { Task } = require('../tasks/task.model');
 const { User } = require('./user.model');
 
 const getAll = async () => {
@@ -24,10 +25,9 @@ const updateUser = async (id, updatedUser) => {
 };
 
 const deleteUser = async id => {
-  // delete tasks
-  // if (task.userId === id) task.userId = null;
-
+  await Task.updateMany({ userId: id }, { userId: null });
   await User.findByIdAndDelete(id);
+
   return 'User and user tasks have been deleted';
 };
 

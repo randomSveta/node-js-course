@@ -1,3 +1,4 @@
+const { Task } = require('../tasks/task.model');
 const { Board } = require('./board.model');
 
 const getAll = async () => {
@@ -26,7 +27,7 @@ const updateBoard = async (id, updatedBoard) => {
 };
 
 const deleteBoard = async id => {
-  // add task deletion
+  await Task.deleteMany({ boardId: id });
   await Board.findByIdAndDelete(id);
 
   return "Board and it's tasks have been deleted";
