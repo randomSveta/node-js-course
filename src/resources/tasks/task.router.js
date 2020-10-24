@@ -1,8 +1,8 @@
 const router = require('express').Router({ mergeParams: true });
 const tasksService = require('./task.service');
 const boardsService = require('../boards/board.service');
-const Task = require('./task.model');
 const boardService = require('../boards/board.service');
+const { Task } = require('./task.model');
 
 router.route('/').get(async (req, res, next) => {
   try {
@@ -10,7 +10,7 @@ router.route('/').get(async (req, res, next) => {
 
     if (board) {
       const tasks = await tasksService.getAll(req.params.boardId);
-      res.json(tasks.map(Task.toResponse));
+      res.json(tasks.map(task => Task.toResponse(task)));
     } else {
       const err = new Error('Not Found');
       err.status = 404;

@@ -1,13 +1,11 @@
 const router = require('express').Router();
+const { User } = require('./user.model');
 const usersService = require('./user.service');
-const tasksService = require('../tasks/task.service');
-const User = require('./user.model');
-const { TASKS } = require('../tasks/tasksDB');
 
 router.route('/').get(async (req, res, next) => {
   try {
     const users = await usersService.getAll();
-    res.status(200).json(users.map(User.toResponse));
+    res.status(200).json(users.map(user => User.toResponse(user)));
   } catch (err) {
     return next(err);
   }
@@ -52,13 +50,6 @@ router.route('/:id').put(async (req, res, next) => {
 
 router.route('/:id').delete(async (req, res, next) => {
   try {
-    while (TASKS.findIndex(task => task.userId === req.params.id) + 1) {
-      const index = TASKS.findIndex(task => task.userId === req.params.id);
-      const newTask = Object.assign({}, TASKS[index]);
-      newTask.userId = null;
-      tasksService.updateTask(TASKS[index].boardId, TASKS[index].id, newTask);
-    }
-
     const message = await usersService.deleteUser(req.params.id);
 
     if (message) res.status(204).send(message);

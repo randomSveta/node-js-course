@@ -24,13 +24,13 @@ const winstonLogger = winston.createLogger({
 function logRequest(req, res, next) {
   const date = new Date();
 
-  // overwrite "id: undefined" for GET, POST params
-  const parameters = {};
-  for (const param in req.params) {
-    if (req.params[param]) parameters[param] = req.params[param];
+  if (req.body.password) {
+    // hide sensitive data
+    Object.defineProperty(req.body, 'password', {
+      enumerable: false,
+      value: req.body.password
+    });
   }
-
-  delete req.body.password; // remove sensitive data
 
   winstonLogger.log(
     'info',
@@ -38,7 +38,7 @@ function logRequest(req, res, next) {
     TIME: ${date.toString()}
     TYPE: ${req.method}
     URL: ${req.originalUrl}
-    PARAMS: ${JSON.stringify(parameters)}
+    QUERY PARAMS: ${JSON.stringify(req.query)}
     BODY: ${
       req.method === 'POST' || req.method === 'PUT'
         ? JSON.stringify(req.body)
@@ -46,6 +46,14 @@ function logRequest(req, res, next) {
     }
 `
   );
+
+  if (req.body.password) {
+    Object.defineProperty(req.body, 'password', {
+      enumerable: true,
+      value: req.body.password
+    });
+  }
+
   next();
 }
 

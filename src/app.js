@@ -12,6 +12,19 @@ const {
   handleUnhandledPromiseRejection
 } = require('./common/error-handler');
 
+const mongoose = require('mongoose');
+mongoose.connect(process.env.MONGO_CONNECTION_STRING, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useFindAndModify: false,
+  useCreateIndex: true
+});
+
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', () => {
+  console.log('----- connected to DB -----');
+});
 const app = express();
 const swaggerDocument = YAML.load(path.join(__dirname, '../doc/api.yaml'));
 
@@ -28,10 +41,7 @@ app.use('/', (req, res, next) => {
 });
 
 // request logger
-app.use(
-  ['/users/:id?', '/boards/:boardId/tasks/:taskId?', '/boards/:id?'],
-  logRequest
-);
+app.use(logRequest);
 
 app.use('/users', userRouter);
 app.use('/boards', boardRouter);
