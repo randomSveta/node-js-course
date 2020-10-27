@@ -17,8 +17,8 @@ const userSchema = new Schema(
     password: {
       type: String,
       unique: false,
-      required: true
-      // select: false
+      required: true,
+      select: false
     }
   },
   { versionKey: false }
