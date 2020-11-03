@@ -7,12 +7,21 @@ const { logAuth } = require('../../common/logger');
 router.route('/').post(async (req, res, next) => {
   try {
     // JSON.parse(req.body);
-    const user = await loginService.getLoginPasswordUser(req.body.login);
-    if (user && req.body.login && req.body.password) {
-      bcrypt.compare(req.body.password, user.password, (err, result) => {
-        if (err) {
-          return next(err);
-        }
+    const users = await loginService.getLoginPasswordUsers(req.body.login);
+    if (users.length > 0 && req.body.login && req.body.password) {
+      const compareAsync = (bodyPassword, userPassword) => {
+        return new Promise((resolve, reject) => {
+          bcrypt.compare(bodyPassword, userPassword, (err, result) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(result);
+            }
+          });
+        });
+      };
+      for (const user of users) {
+        const result = await compareAsync(req.body.password, user.password);
         if (result) {
           const token = jwt.sign(
             {
@@ -25,15 +34,19 @@ router.route('/').post(async (req, res, next) => {
               expiresIn: '1h'
             }
           );
-
           const payload = jwt.verify(token, process.env.JWT_SECRET_KEY);
           logAuth(req.body.login, token, payload);
 
           res.status(200).send({ token });
+          break;
+        } else {
+          const err = new Error('Incorrect password for given login!');
+          err.status = 403;
+          return next(err);
         }
-      });
+      }
     } else {
-      const err = new Error('Incorrect login or password');
+      const err = new Error("Login doesn't exist in DB!");
       err.status = 403;
       return next(err);
     }

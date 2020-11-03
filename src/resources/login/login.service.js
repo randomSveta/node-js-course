@@ -1,6 +1,5 @@
 const loginRepo = require('./login.db.repository');
 
-const getLoginPasswordUser = (login, password) =>
-  loginRepo.getLoginPasswordUser(login, password);
+const getLoginPasswordUsers = login => loginRepo.getLoginPasswordUsers(login);
 
-module.exports = { getLoginPasswordUser };
+module.exports = { getLoginPasswordUsers };
