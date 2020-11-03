@@ -23,7 +23,6 @@ const winstonLogger = winston.createLogger({
 
 function logRequest(req, res, next) {
   const date = new Date();
-
   if (req.body.password) {
     // hide password
     Object.defineProperty(req.body, 'password', {
@@ -31,10 +30,10 @@ function logRequest(req, res, next) {
       value: req.body.password
     });
   }
-
   winstonLogger.log(
     'info',
     `
+    ----- REQUEST -----
     TIME: ${date.toString()}
     TYPE: ${req.method}
     URL: ${req.originalUrl}
@@ -53,6 +52,17 @@ function logRequest(req, res, next) {
       value: req.body.password
     });
   }
+
+  res.on('finish', () => {
+    winstonLogger.log(
+      'info',
+      `----- RESPONSE -----
+      TIME: ${date.toString()}
+      TYPE: ${req.method}
+      URL: ${req.originalUrl}
+      RESPONSE CODE: ${res.statusCode}`
+    );
+  });
 
   next();
 }

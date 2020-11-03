@@ -1,55 +1,31 @@
 const router = require('express').Router();
 const loginService = require('./login.service');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
-const { logAuth } = require('../../common/logger');
+const { addJWTtoken } = require('../login/authentication');
+
+router.route('/').get(async (req, res, next) => {
+  try {
+    return res.status(200).send('Login page');
+  } catch (err) {
+    return next(err);
+  }
+});
 
 router.route('/').post(async (req, res, next) => {
   try {
-    // JSON.parse(req.body);
     const users = await loginService.getLoginPasswordUsers(req.body.login);
-    if (users.length > 0 && req.body.login && req.body.password) {
-      const compareAsync = (bodyPassword, userPassword) => {
-        return new Promise((resolve, reject) => {
-          bcrypt.compare(bodyPassword, userPassword, (err, result) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve(result);
-            }
-          });
-        });
-      };
-      for (const user of users) {
-        const result = await compareAsync(req.body.password, user.password);
-        if (result) {
-          const token = jwt.sign(
-            {
-              userId: user.id,
-              login: user.login
-            },
-            process.env.JWT_SECRET_KEY,
-            { algorithm: 'HS256' },
-            {
-              expiresIn: '1h'
-            }
-          );
-          const payload = jwt.verify(token, process.env.JWT_SECRET_KEY);
-          logAuth(req.body.login, token, payload);
 
-          res.status(200).send({ token });
-          break;
-        } else {
-          const err = new Error('Incorrect password for given login!');
-          err.status = 403;
-          return next(err);
-        }
-      }
-    } else {
-      const err = new Error("Login doesn't exist in DB!");
-      err.status = 403;
-      return next(err);
+    if (users.length > 0 && req.body.login && req.body.password) {
+      const token = await addJWTtoken(req.body, users);
+
+      if (token) return res.status(200).send({ token });
+
+      const error = new Error('Access token is missing or invalid');
+      error.status = 401;
+      return next(error);
     }
+    const err = new Error("Login doesn't exist in DB!");
+    err.status = 401;
+    return next(err);
   } catch (err) {
     return next(err);
   }
