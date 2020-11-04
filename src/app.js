@@ -5,6 +5,7 @@ const YAML = require('yamljs');
 const userRouter = require('./resources/users/user.router');
 const boardRouter = require('./resources/boards/board.router');
 const taskRouter = require('./resources/tasks/task.router');
+const loginRouter = require('./resources/login/login.router');
 const { logRequest, logError } = require('./common/logger');
 const {
   handleErrors,
@@ -12,19 +13,6 @@ const {
   handleUnhandledPromiseRejection
 } = require('./common/error-handler');
 
-const mongoose = require('mongoose');
-mongoose.connect(process.env.MONGO_CONNECTION_STRING, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useFindAndModify: false,
-  useCreateIndex: true
-});
-
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', () => {
-  console.log('----- connected to DB -----');
-});
 const app = express();
 const swaggerDocument = YAML.load(path.join(__dirname, '../doc/api.yaml'));
 
@@ -46,6 +34,7 @@ app.use(logRequest);
 app.use('/users', userRouter);
 app.use('/boards', boardRouter);
 app.use('/boards/:boardId/tasks', taskRouter);
+app.use('/login', loginRouter);
 
 // error logger and handler
 app.use(handleErrors, logError);

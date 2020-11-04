@@ -4,7 +4,6 @@ const { User } = require('./user.model');
 const getAll = async () => {
   // throw new Error(); //error 500
   const users = await User.find({});
-
   return users;
 };
 
